@@ -1,0 +1,131 @@
+:root {
+  --one-mind-font-sans: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --one-mind-page-background: #fdfdfd;
+  --one-mind-surface: #fdfdfd;
+  --one-mind-surface-subtle: #ededed;
+  --one-mind-surface-strong: #2d2e2f;
+  --one-mind-text-primary: #2d2e2f;
+  --one-mind-text-secondary: color-mix(in srgb, #2d2e2f 76%, #fdfdfd);
+  --one-mind-text-muted: color-mix(in srgb, #2d2e2f 58%, #fdfdfd);
+  --one-mind-text-inverse: #f7f7f7;
+  --one-mind-border: #d8d8d8;
+  --one-mind-border-subtle: #d8d8d8;
+  --one-mind-success: #1aac5b;
+  --one-mind-danger: #ff0000;
+  --one-mind-shadow-soft: 0 20px 64px color-mix(in srgb, #2d2e2f 9%, transparent);
+  --one-mind-tool-openai: #10a37f;
+  --one-mind-tool-claude: #d97757;
+  --one-mind-tool-antigravity: #4285f4;
+  --one-mind-tool-openclaw: #ff4d4d;
+  --one-mind-tool-codebuddy: #6558f5;
+  --one-mind-tool-qoder: #2adb5c;
+  --one-mind-tool-trae: #00e99b;
+  --one-mind-tool-neutral: #2d2e2f;
+  --bs-bg: var(--one-mind-page-background);
+  --bs-main: var(--one-mind-text-primary);
+  --bs-selected: var(--one-mind-surface-subtle);
+  color-scheme: light;
+}
+
+:root[data-beta-signin-theme="dark"] {
+  --one-mind-page-background: #2d2e2f;
+  --one-mind-surface: #2d2e2f;
+  --one-mind-surface-subtle: #94969c;
+  --one-mind-surface-strong: #f7f7f7;
+  --one-mind-text-primary: #f7f7f7;
+  --one-mind-text-secondary: color-mix(in srgb, #f7f7f7 78%, #2d2e2f);
+  --one-mind-text-muted: color-mix(in srgb, #f7f7f7 62%, #2d2e2f);
+  --one-mind-text-inverse: #2d2e2f;
+  --one-mind-border: #d8d8d8;
+  --one-mind-border-subtle: color-mix(in srgb, #d8d8d8 42%, transparent);
+  --one-mind-shadow-soft: 0 24px 72px color-mix(in srgb, #000 38%, transparent);
+  --one-mind-tool-neutral: #f7f7f7;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 100%; min-width: 280px; height: 100%; min-height: 100%; margin: 0; overflow: hidden; }
+body { background: var(--bs-bg); color: var(--bs-main); font-family: var(--one-mind-font-sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+button, a { font: inherit; }
+button { appearance: none; }
+
+.beta-signin-app { display: grid; grid-template-rows: 64px minmax(0, 1fr); width: 100%; height: 100dvh; min-height: 0; overflow: hidden; background: var(--bs-bg); color: var(--bs-main); }
+.beta-signin-menu { position: relative; z-index: 10; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; width: 100%; height: 64px; padding-left: 24px; border-bottom: 1px solid var(--one-mind-border-subtle); background: color-mix(in srgb, var(--one-mind-page-background) 88%, transparent); backdrop-filter: saturate(150%) blur(22px); }
+.beta-signin-brand { display: inline-flex; align-items: center; justify-self: start; height: 40px; padding-right: 12px; border-radius: 6px; color: inherit; text-decoration: none; }
+.beta-signin-mark-frame { position: relative; display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; }
+.beta-signin-mark { position: absolute; display: block; width: 24px; height: 24px; object-fit: contain; }
+.beta-signin-name, .beta-signin-version { font-size: 20px; line-height: 1; white-space: nowrap; }
+.beta-signin-name { font-weight: 600; }
+.beta-signin-version { margin-left: 8px; font-weight: 900; }
+.beta-signin-actions { display: flex; align-items: center; justify-self: end; gap: 8px; height: 64px; padding-right: 24px; }
+.beta-signin-control { position: relative; }
+.beta-signin-icon-button { position: relative; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+.beta-signin-icon-button svg, .beta-signin-icon-button img { position: absolute; width: 24px; height: 24px; object-fit: contain; }
+.beta-signin-brand:hover, .beta-signin-icon-button:hover, .beta-signin-icon-button[aria-expanded="true"] { background: var(--bs-selected); }
+.beta-signin-brand:active, .beta-signin-icon-button:active { transform: translateY(1px); }
+.beta-signin-brand:focus-visible, .beta-signin-icon-button:focus-visible, .beta-signin-popup button:focus-visible, .one-mind-beta-sign-in-tool-halo__item:focus-visible, .one-mind-auth-submit:focus-visible, .beta-signin-enter-matrix:focus-visible { outline: 2px solid var(--one-mind-text-primary); outline-offset: 3px; }
+.beta-signin-popup { position: absolute; top: 44px; right: -4px; display: grid; min-width: 210px; padding: 6px; border: 1px solid var(--one-mind-border-subtle); border-radius: 8px; background: color-mix(in srgb, var(--one-mind-surface) 92%, transparent); box-shadow: var(--one-mind-shadow-soft); backdrop-filter: saturate(160%) blur(24px); }
+.beta-signin-popup[hidden] { display: none; }
+.beta-signin-popup button { display: flex; align-items: center; justify-content: space-between; min-height: 38px; padding: 0 10px; border: 0; border-radius: 5px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.beta-signin-popup button:hover, .beta-signin-popup button[aria-checked="true"] { background: var(--bs-selected); }
+.beta-signin-popup-check { width: 18px; margin-left: 16px; text-align: center; }
+
+.beta-signin-content { position: relative; isolation: isolate; min-width: 0; min-height: 0; overflow: auto; background: var(--one-mind-page-background); }
+.one-mind-square-dot-sea, .one-mind-square-dot-sea canvas { display: block; width: 100%; height: 100%; }
+.one-mind-square-dot-sea { position: absolute; z-index: 0; inset: 0; overflow: hidden; }
+.beta-signin-dot-sea { opacity: .54; }
+.beta-signin-stage { position: relative; z-index: 1; display: grid; place-items: center; width: 100%; height: 100%; min-height: 632px; padding: 64px; }
+
+.one-mind-beta-sign-in-tool-halo { position: absolute; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; }
+.one-mind-beta-sign-in-tool-halo__item { position: absolute; top: var(--one-mind-beta-sign-in-logo-y); left: var(--one-mind-beta-sign-in-logo-x); width: 64px; height: 64px; padding: 0; border: 0; background: transparent; color: inherit; cursor: grab; pointer-events: auto; touch-action: none; transform: translate(-50%, -50%); user-select: none; animation: one-mind-beta-sign-in-logo-float 7.2s ease-in-out var(--one-mind-beta-sign-in-logo-delay, 0s) infinite; }
+.one-mind-beta-sign-in-tool-halo__surface { display: grid; place-items: center; width: 64px; height: 64px; border: 1px solid color-mix(in srgb, var(--one-mind-border) 76%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--one-mind-surface) 86%, transparent); box-shadow: 0 18px 44px color-mix(in srgb, var(--one-mind-text-primary) 10%, transparent); backdrop-filter: saturate(150%) blur(16px); transform: scale(1); transition: box-shadow 180ms ease, transform 180ms cubic-bezier(.22, 1, .36, 1); }
+.one-mind-beta-sign-in-tool-halo__item:hover { z-index: 2; }
+.one-mind-beta-sign-in-tool-halo__item:focus-visible { z-index: 3; border-radius: 16px; outline-width: 3px; outline-offset: 4px; }
+.one-mind-beta-sign-in-tool-halo__item:hover .one-mind-beta-sign-in-tool-halo__surface { box-shadow: 0 22px 54px color-mix(in srgb, var(--one-mind-text-primary) 15%, transparent), inset 0 1px 0 color-mix(in srgb, var(--one-mind-text-inverse) 22%, transparent); transform: scale(1.24); }
+.one-mind-beta-sign-in-tool-halo__item img { position: absolute; width: 40px; height: 40px; border-radius: 9px; object-fit: contain; }
+.one-mind-beta-theme-asset--on-dark { display: none; }
+:root[data-beta-signin-theme="dark"] .one-mind-beta-theme-asset--on-light { display: none; }
+:root[data-beta-signin-theme="dark"] .one-mind-beta-theme-asset--on-dark { display: block; }
+.one-mind-beta-sign-in-tool-halo__item[data-drag-state="dragging"], .one-mind-beta-sign-in-tool-halo__item[data-drag-state="placed"] { top: var(--one-mind-beta-sign-in-logo-drag-y); left: var(--one-mind-beta-sign-in-logo-drag-x); }
+.one-mind-beta-sign-in-tool-halo__item[data-drag-state="dragging"] { z-index: 4; animation: none; cursor: grabbing; }
+@keyframes one-mind-beta-sign-in-logo-float { 0%, 100% { transform: translate(-50%, -50%) translateY(-4px); } 50% { transform: translate(-50%, -50%) translateY(5px); } }
+
+.beta-signin-panel.one-mind-auth-panel { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 12px; width: min(480px, 100%); min-height: 0; padding: 48px; border: 1px solid var(--one-mind-border-subtle); border-radius: 12px; background: var(--one-mind-surface); box-shadow: var(--one-mind-shadow-soft); }
+.one-mind-auth-panel__header { display: grid; margin: 0; text-align: center; }
+.beta-signin-panel .one-mind-auth-panel__title { margin: 0; color: var(--one-mind-text-primary); font-size: clamp(34px, 3vw, 44px); font-weight: 760; letter-spacing: -.052em; line-height: 1; }
+.beta-signin-panel .one-mind-auth-status { display: grid; gap: 4px; margin: 0; padding: 12px 14px; border: 1px solid var(--one-mind-border-subtle); border-radius: 7px; background: color-mix(in srgb, var(--one-mind-surface-subtle) 42%, transparent); color: var(--one-mind-text-secondary); font-size: 14px; line-height: 1.4; }
+.beta-signin-panel .one-mind-auth-status strong, .beta-signin-panel .one-mind-auth-status p { margin: 0; }
+.beta-signin-panel .one-mind-auth-status--success { border-color: color-mix(in srgb, var(--one-mind-success) 48%, var(--one-mind-border)); }
+.beta-signin-panel .one-mind-auth-status--error { border-color: color-mix(in srgb, var(--one-mind-danger) 42%, var(--one-mind-border)); }
+.browser-copy { display: none; }
+body[data-return-to-app="false"] .app-copy { display: none; }
+body[data-return-to-app="false"] .browser-copy { display: block; }
+.beta-signin-return-actions { display: grid; gap: 12px; margin-top: 0; }
+.one-mind-auth-submit { display: flex; align-items: center; justify-content: center; width: 100%; height: 48px; margin-top: 0; border: 1px solid var(--one-mind-surface-strong); border-radius: 6px; background: var(--one-mind-surface-strong); color: var(--one-mind-text-inverse); font-size: 16px; font-weight: 650; text-decoration: none; cursor: pointer; }
+body[data-return-to-app="false"] .one-mind-auth-submit { display: none; }
+.one-mind-auth-submit:hover { opacity: .86; }
+.one-mind-auth-submit:active, .beta-signin-enter-matrix:active { transform: translateY(1px); }
+.beta-signin-enter-matrix { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; border: 0; border-radius: 6px; background: transparent; color: var(--one-mind-text-secondary); font-size: 15px; font-weight: 650; text-decoration: none; transition: background-color 160ms ease, color 160ms ease, transform 120ms ease; }
+.beta-signin-enter-matrix:hover, .beta-signin-enter-matrix:focus-visible { background: var(--one-mind-surface-subtle); color: var(--one-mind-text-primary); }
+.beta-signin-panel > * { animation: beta-signin-panel-step-enter 240ms cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes beta-signin-panel-step-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 1120px) { .beta-signin-stage { padding: 48px; } }
+@media (max-width: 720px) {
+  .beta-signin-menu { padding-left: 12px; }
+  .beta-signin-actions { padding-right: 12px; }
+  .beta-signin-name, .beta-signin-version { font-size: 17px; }
+  .beta-signin-content { overflow-x: hidden; }
+  .beta-signin-stage { align-items: start; min-height: 100%; padding: 24px 16px 40px; }
+  .one-mind-beta-sign-in-tool-halo { display: none; }
+  .beta-signin-panel.one-mind-auth-panel { padding: 36px 24px; }
+  .beta-signin-panel .one-mind-auth-panel__title { font-size: 32px; }
+}
+@media (max-width: 380px) { .beta-signin-name, .beta-signin-version { font-size: 15px; } .beta-signin-version { margin-left: 6px; } .beta-signin-actions { gap: 0; } }
+@media (max-height: 860px) and (min-width: 721px) { .beta-signin-stage { align-items: start; min-height: 632px; padding-top: 40px; padding-bottom: 40px; } }
+@media (prefers-reduced-motion: reduce) {
+  .beta-signin-panel > * { animation: none; }
+  .beta-signin-brand:active, .beta-signin-icon-button:active, .one-mind-auth-submit:active, .beta-signin-enter-matrix:active { transform: none; }
+  .one-mind-beta-sign-in-tool-halo__item { animation: none; transform: translate(-50%, -50%); }
+  .one-mind-beta-sign-in-tool-halo__surface, .beta-signin-enter-matrix { transition: none; }
+}

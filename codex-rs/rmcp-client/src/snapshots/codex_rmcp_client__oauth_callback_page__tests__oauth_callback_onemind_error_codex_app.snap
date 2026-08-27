@@ -1,0 +1,428 @@
+---
+source: rmcp-client/src/oauth_callback_page_tests.rs
+expression: page
+---
+<!DOCTYPE html>
+<html lang="en" data-beta-signin-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Authorize Codex · OneMind BETA</title>
+    <style>:root {
+  --one-mind-font-sans: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --one-mind-page-background: #fdfdfd;
+  --one-mind-surface: #fdfdfd;
+  --one-mind-surface-subtle: #ededed;
+  --one-mind-surface-strong: #2d2e2f;
+  --one-mind-text-primary: #2d2e2f;
+  --one-mind-text-secondary: color-mix(in srgb, #2d2e2f 76%, #fdfdfd);
+  --one-mind-text-muted: color-mix(in srgb, #2d2e2f 58%, #fdfdfd);
+  --one-mind-text-inverse: #f7f7f7;
+  --one-mind-border: #d8d8d8;
+  --one-mind-border-subtle: #d8d8d8;
+  --one-mind-success: #1aac5b;
+  --one-mind-danger: #ff0000;
+  --one-mind-shadow-soft: 0 20px 64px color-mix(in srgb, #2d2e2f 9%, transparent);
+  --one-mind-tool-openai: #10a37f;
+  --one-mind-tool-claude: #d97757;
+  --one-mind-tool-antigravity: #4285f4;
+  --one-mind-tool-openclaw: #ff4d4d;
+  --one-mind-tool-codebuddy: #6558f5;
+  --one-mind-tool-qoder: #2adb5c;
+  --one-mind-tool-trae: #00e99b;
+  --one-mind-tool-neutral: #2d2e2f;
+  --bs-bg: var(--one-mind-page-background);
+  --bs-main: var(--one-mind-text-primary);
+  --bs-selected: var(--one-mind-surface-subtle);
+  color-scheme: light;
+}
+
+:root[data-beta-signin-theme="dark"] {
+  --one-mind-page-background: #2d2e2f;
+  --one-mind-surface: #2d2e2f;
+  --one-mind-surface-subtle: #94969c;
+  --one-mind-surface-strong: #f7f7f7;
+  --one-mind-text-primary: #f7f7f7;
+  --one-mind-text-secondary: color-mix(in srgb, #f7f7f7 78%, #2d2e2f);
+  --one-mind-text-muted: color-mix(in srgb, #f7f7f7 62%, #2d2e2f);
+  --one-mind-text-inverse: #2d2e2f;
+  --one-mind-border: #d8d8d8;
+  --one-mind-border-subtle: color-mix(in srgb, #d8d8d8 42%, transparent);
+  --one-mind-shadow-soft: 0 24px 72px color-mix(in srgb, #000 38%, transparent);
+  --one-mind-tool-neutral: #f7f7f7;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 100%; min-width: 280px; height: 100%; min-height: 100%; margin: 0; overflow: hidden; }
+body { background: var(--bs-bg); color: var(--bs-main); font-family: var(--one-mind-font-sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+button, a { font: inherit; }
+button { appearance: none; }
+
+.beta-signin-app { display: grid; grid-template-rows: 64px minmax(0, 1fr); width: 100%; height: 100dvh; min-height: 0; overflow: hidden; background: var(--bs-bg); color: var(--bs-main); }
+.beta-signin-menu { position: relative; z-index: 10; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; width: 100%; height: 64px; padding-left: 24px; border-bottom: 1px solid var(--one-mind-border-subtle); background: color-mix(in srgb, var(--one-mind-page-background) 88%, transparent); backdrop-filter: saturate(150%) blur(22px); }
+.beta-signin-brand { display: inline-flex; align-items: center; justify-self: start; height: 40px; padding-right: 12px; border-radius: 6px; color: inherit; text-decoration: none; }
+.beta-signin-mark-frame { position: relative; display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; }
+.beta-signin-mark { position: absolute; display: block; width: 24px; height: 24px; object-fit: contain; }
+.beta-signin-name, .beta-signin-version { font-size: 20px; line-height: 1; white-space: nowrap; }
+.beta-signin-name { font-weight: 600; }
+.beta-signin-version { margin-left: 8px; font-weight: 900; }
+.beta-signin-actions { display: flex; align-items: center; justify-self: end; gap: 8px; height: 64px; padding-right: 24px; }
+.beta-signin-control { position: relative; }
+.beta-signin-icon-button { position: relative; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+.beta-signin-icon-button svg, .beta-signin-icon-button img { position: absolute; width: 24px; height: 24px; object-fit: contain; }
+.beta-signin-brand:hover, .beta-signin-icon-button:hover, .beta-signin-icon-button[aria-expanded="true"] { background: var(--bs-selected); }
+.beta-signin-brand:active, .beta-signin-icon-button:active { transform: translateY(1px); }
+.beta-signin-brand:focus-visible, .beta-signin-icon-button:focus-visible, .beta-signin-popup button:focus-visible, .one-mind-beta-sign-in-tool-halo__item:focus-visible, .one-mind-auth-submit:focus-visible, .beta-signin-enter-matrix:focus-visible { outline: 2px solid var(--one-mind-text-primary); outline-offset: 3px; }
+.beta-signin-popup { position: absolute; top: 44px; right: -4px; display: grid; min-width: 210px; padding: 6px; border: 1px solid var(--one-mind-border-subtle); border-radius: 8px; background: color-mix(in srgb, var(--one-mind-surface) 92%, transparent); box-shadow: var(--one-mind-shadow-soft); backdrop-filter: saturate(160%) blur(24px); }
+.beta-signin-popup[hidden] { display: none; }
+.beta-signin-popup button { display: flex; align-items: center; justify-content: space-between; min-height: 38px; padding: 0 10px; border: 0; border-radius: 5px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.beta-signin-popup button:hover, .beta-signin-popup button[aria-checked="true"] { background: var(--bs-selected); }
+.beta-signin-popup-check { width: 18px; margin-left: 16px; text-align: center; }
+
+.beta-signin-content { position: relative; isolation: isolate; min-width: 0; min-height: 0; overflow: auto; background: var(--one-mind-page-background); }
+.one-mind-square-dot-sea, .one-mind-square-dot-sea canvas { display: block; width: 100%; height: 100%; }
+.one-mind-square-dot-sea { position: absolute; z-index: 0; inset: 0; overflow: hidden; }
+.beta-signin-dot-sea { opacity: .54; }
+.beta-signin-stage { position: relative; z-index: 1; display: grid; place-items: center; width: 100%; height: 100%; min-height: 632px; padding: 64px; }
+
+.one-mind-beta-sign-in-tool-halo { position: absolute; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; }
+.one-mind-beta-sign-in-tool-halo__item { position: absolute; top: var(--one-mind-beta-sign-in-logo-y); left: var(--one-mind-beta-sign-in-logo-x); width: 64px; height: 64px; padding: 0; border: 0; background: transparent; color: inherit; cursor: grab; pointer-events: auto; touch-action: none; transform: translate(-50%, -50%); user-select: none; animation: one-mind-beta-sign-in-logo-float 7.2s ease-in-out var(--one-mind-beta-sign-in-logo-delay, 0s) infinite; }
+.one-mind-beta-sign-in-tool-halo__surface { display: grid; place-items: center; width: 64px; height: 64px; border: 1px solid color-mix(in srgb, var(--one-mind-border) 76%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--one-mind-surface) 86%, transparent); box-shadow: 0 18px 44px color-mix(in srgb, var(--one-mind-text-primary) 10%, transparent); backdrop-filter: saturate(150%) blur(16px); transform: scale(1); transition: box-shadow 180ms ease, transform 180ms cubic-bezier(.22, 1, .36, 1); }
+.one-mind-beta-sign-in-tool-halo__item:hover { z-index: 2; }
+.one-mind-beta-sign-in-tool-halo__item:focus-visible { z-index: 3; border-radius: 16px; outline-width: 3px; outline-offset: 4px; }
+.one-mind-beta-sign-in-tool-halo__item:hover .one-mind-beta-sign-in-tool-halo__surface { box-shadow: 0 22px 54px color-mix(in srgb, var(--one-mind-text-primary) 15%, transparent), inset 0 1px 0 color-mix(in srgb, var(--one-mind-text-inverse) 22%, transparent); transform: scale(1.24); }
+.one-mind-beta-sign-in-tool-halo__item img { position: absolute; width: 40px; height: 40px; border-radius: 9px; object-fit: contain; }
+.one-mind-beta-theme-asset--on-dark { display: none; }
+:root[data-beta-signin-theme="dark"] .one-mind-beta-theme-asset--on-light { display: none; }
+:root[data-beta-signin-theme="dark"] .one-mind-beta-theme-asset--on-dark { display: block; }
+.one-mind-beta-sign-in-tool-halo__item[data-drag-state="dragging"], .one-mind-beta-sign-in-tool-halo__item[data-drag-state="placed"] { top: var(--one-mind-beta-sign-in-logo-drag-y); left: var(--one-mind-beta-sign-in-logo-drag-x); }
+.one-mind-beta-sign-in-tool-halo__item[data-drag-state="dragging"] { z-index: 4; animation: none; cursor: grabbing; }
+@keyframes one-mind-beta-sign-in-logo-float { 0%, 100% { transform: translate(-50%, -50%) translateY(-4px); } 50% { transform: translate(-50%, -50%) translateY(5px); } }
+
+.beta-signin-panel.one-mind-auth-panel { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; gap: 12px; width: min(480px, 100%); min-height: 0; padding: 48px; border: 1px solid var(--one-mind-border-subtle); border-radius: 12px; background: var(--one-mind-surface); box-shadow: var(--one-mind-shadow-soft); }
+.one-mind-auth-panel__header { display: grid; margin: 0; text-align: center; }
+.beta-signin-panel .one-mind-auth-panel__title { margin: 0; color: var(--one-mind-text-primary); font-size: clamp(34px, 3vw, 44px); font-weight: 760; letter-spacing: -.052em; line-height: 1; }
+.beta-signin-panel .one-mind-auth-status { display: grid; gap: 4px; margin: 0; padding: 12px 14px; border: 1px solid var(--one-mind-border-subtle); border-radius: 7px; background: color-mix(in srgb, var(--one-mind-surface-subtle) 42%, transparent); color: var(--one-mind-text-secondary); font-size: 14px; line-height: 1.4; }
+.beta-signin-panel .one-mind-auth-status strong, .beta-signin-panel .one-mind-auth-status p { margin: 0; }
+.beta-signin-panel .one-mind-auth-status--success { border-color: color-mix(in srgb, var(--one-mind-success) 48%, var(--one-mind-border)); }
+.beta-signin-panel .one-mind-auth-status--error { border-color: color-mix(in srgb, var(--one-mind-danger) 42%, var(--one-mind-border)); }
+.browser-copy { display: none; }
+body[data-return-to-app="false"] .app-copy { display: none; }
+body[data-return-to-app="false"] .browser-copy { display: block; }
+.beta-signin-return-actions { display: grid; gap: 12px; margin-top: 0; }
+.one-mind-auth-submit { display: flex; align-items: center; justify-content: center; width: 100%; height: 48px; margin-top: 0; border: 1px solid var(--one-mind-surface-strong); border-radius: 6px; background: var(--one-mind-surface-strong); color: var(--one-mind-text-inverse); font-size: 16px; font-weight: 650; text-decoration: none; cursor: pointer; }
+body[data-return-to-app="false"] .one-mind-auth-submit { display: none; }
+.one-mind-auth-submit:hover { opacity: .86; }
+.one-mind-auth-submit:active, .beta-signin-enter-matrix:active { transform: translateY(1px); }
+.beta-signin-enter-matrix { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; border: 0; border-radius: 6px; background: transparent; color: var(--one-mind-text-secondary); font-size: 15px; font-weight: 650; text-decoration: none; transition: background-color 160ms ease, color 160ms ease, transform 120ms ease; }
+.beta-signin-enter-matrix:hover, .beta-signin-enter-matrix:focus-visible { background: var(--one-mind-surface-subtle); color: var(--one-mind-text-primary); }
+.beta-signin-panel > * { animation: beta-signin-panel-step-enter 240ms cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes beta-signin-panel-step-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 1120px) { .beta-signin-stage { padding: 48px; } }
+@media (max-width: 720px) {
+  .beta-signin-menu { padding-left: 12px; }
+  .beta-signin-actions { padding-right: 12px; }
+  .beta-signin-name, .beta-signin-version { font-size: 17px; }
+  .beta-signin-content { overflow-x: hidden; }
+  .beta-signin-stage { align-items: start; min-height: 100%; padding: 24px 16px 40px; }
+  .one-mind-beta-sign-in-tool-halo { display: none; }
+  .beta-signin-panel.one-mind-auth-panel { padding: 36px 24px; }
+  .beta-signin-panel .one-mind-auth-panel__title { font-size: 32px; }
+}
+@media (max-width: 380px) { .beta-signin-name, .beta-signin-version { font-size: 15px; } .beta-signin-version { margin-left: 6px; } .beta-signin-actions { gap: 0; } }
+@media (max-height: 860px) and (min-width: 721px) { .beta-signin-stage { align-items: start; min-height: 632px; padding-top: 40px; padding-bottom: 40px; } }
+@media (prefers-reduced-motion: reduce) {
+  .beta-signin-panel > * { animation: none; }
+  .beta-signin-brand:active, .beta-signin-icon-button:active, .one-mind-auth-submit:active, .beta-signin-enter-matrix:active { transform: none; }
+  .one-mind-beta-sign-in-tool-halo__item { animation: none; transform: translate(-50%, -50%); }
+  .one-mind-beta-sign-in-tool-halo__surface, .beta-signin-enter-matrix { transition: none; }
+}
+</style>
+  </head>
+  <body data-page-state="error" data-return-to-app="true">
+    <div class="beta-signin-app">
+      <header class="beta-signin-menu">
+        <a class="beta-signin-brand" href="https://onemind.team/#signin" aria-label="OneMind BETA">
+          <span class="beta-signin-mark-frame">
+            <img alt="" class="beta-signin-mark one-mind-beta-theme-asset--on-light" src="https://onemind.team/assets/beta-navigation/logo-light.png" />
+            <img alt="" class="beta-signin-mark one-mind-beta-theme-asset--on-dark" src="https://onemind.team/assets/beta-navigation/logo-dark.png" />
+          </span>
+          <span class="beta-signin-name">OneMind</span><span class="beta-signin-version">BETA</span>
+        </a>
+        <div class="beta-signin-actions">
+          <div class="beta-signin-control">
+            <button aria-expanded="false" aria-haspopup="menu" class="beta-signin-icon-button" data-menu-toggle="language" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M3.4 12h17.2M12 3c2.3 2.5 3.5 5.5 3.5 9S14.3 18.5 12 21c-2.3-2.5-3.5-5.5-3.5-9S9.7 5.5 12 3Z" stroke="currentColor" stroke-width="1.8"/></svg>
+            </button>
+            <div class="beta-signin-popup" data-menu="language" hidden role="menu"></div>
+          </div>
+          <div class="beta-signin-control">
+            <button aria-expanded="false" aria-haspopup="menu" class="beta-signin-icon-button" data-menu-toggle="display" type="button">
+              <img alt="" class="one-mind-beta-theme-asset--on-light" src="https://onemind.team/assets/beta-navigation/display-light.png" />
+              <img alt="" class="one-mind-beta-theme-asset--on-dark" src="https://onemind.team/assets/beta-navigation/display-dark.png" />
+            </button>
+            <div class="beta-signin-popup" data-menu="display" hidden role="menu"></div>
+          </div>
+        </div>
+      </header>
+      <main class="beta-signin-content">
+        <div aria-hidden="true" class="one-mind-square-dot-sea beta-signin-dot-sea"><canvas></canvas></div>
+        <div class="beta-signin-stage">
+          <div class="one-mind-beta-sign-in-tool-halo" data-beta-sign-in-tool-halo="true"></div>
+          <section class="one-mind-auth-panel signin-auth-panel beta-signin-panel beta-signin-panel--step-device-compact" aria-labelledby="authorization-title">
+            <header class="one-mind-auth-panel__header"><h1 class="one-mind-auth-panel__title signin-auth-title" data-i18n="title" id="authorization-title">Authorize Codex</h1></header>
+            <div class="one-mind-auth-status one-mind-auth-status--error signin-status-panel signin-status-panel--error" role="alert">
+              <strong data-i18n="errorTitle">Authorization not completed</strong>
+              <p data-i18n="errorBody">Return to Codex and try connecting OneMind again.</p>
+            </div>
+            <div class="beta-signin-return-actions">
+              <a class="one-mind-auth-submit beta-signin-return" data-i18n="returnToCodex" href="codex://settings/connections">Return to Codex</a>
+              <a class="beta-signin-enter-matrix" data-i18n="enterMatrix" href="https://onemind.team/">Enter Matrix</a>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <script>(function () {
+  const copy = {
+    en: { language: "Language", display: "Display mode", auto: "Automatic", light: "Light", dark: "Dark", title: "Authorize Codex", successTitle: "Codex authorized", successAppBody: "Return to Codex. The app will continue automatically.", successBrowserBody: "Authentication complete. You may close this tab and return to Codex.", errorTitle: "Authorization not completed", errorBody: "Return to Codex and try connecting OneMind again.", returnToCodex: "Return to Codex", enterMatrix: "Enter Matrix" },
+    "zh-SG": { language: "语言", display: "显示模式", auto: "自动", light: "浅色", dark: "深色", title: "授权 Codex", successTitle: "Codex 已授权", successAppBody: "请返回 Codex，App 会自动继续。", successBrowserBody: "认证已完成。你可以关闭此标签页并返回 Codex。", errorTitle: "授权未完成", errorBody: "请返回 Codex，然后再次尝试连接 OneMind。", returnToCodex: "返回 Codex", enterMatrix: "进入 Matrix" },
+    "zh-HK": { language: "語言", display: "顯示模式", auto: "自動", light: "淺色", dark: "深色", title: "授權 Codex", successTitle: "Codex 已授權", successAppBody: "請返回 Codex，App 會自動繼續。", successBrowserBody: "認證已完成。你可以關閉此分頁並返回 Codex。", errorTitle: "授權未完成", errorBody: "請返回 Codex，然後再次嘗試連接 OneMind。", returnToCodex: "返回 Codex", enterMatrix: "進入 Matrix" },
+    ja: { language: "言語", display: "表示モード", auto: "自動", light: "ライト", dark: "ダーク", title: "Codex を認証", successTitle: "Codex を認証しました", successAppBody: "Codex に戻ってください。App が自動的に続行します。", successBrowserBody: "認証が完了しました。このタブを閉じて Codex に戻れます。", errorTitle: "認証が完了しませんでした", errorBody: "Codex に戻り、OneMind への接続をもう一度お試しください。", returnToCodex: "Codex に戻る", enterMatrix: "Matrix に入る" },
+    ko: { language: "언어", display: "화면 모드", auto: "자동", light: "라이트", dark: "다크", title: "Codex 인증", successTitle: "Codex 인증 완료", successAppBody: "Codex로 돌아가세요. App이 자동으로 계속합니다.", successBrowserBody: "인증이 완료되었습니다. 이 탭을 닫고 Codex로 돌아가세요.", errorTitle: "인증이 완료되지 않았습니다", errorBody: "Codex로 돌아가 OneMind 연결을 다시 시도하세요.", returnToCodex: "Codex로 돌아가기", enterMatrix: "Matrix로 이동" }
+  };
+  const localeNames = { en: "English", "zh-SG": "简体中文", "zh-HK": "繁體中文", ja: "日本語", ko: "한국어" };
+  const tools = [
+    ["chatgpt", "ChatGPT", 8, 16, -4.4, "chatgpt-on-light.png", "chatgpt-on-dark.png"],
+    ["claude-code", "Claude Code", 14, 40, -2.6, "claude.png", "claude.png"],
+    ["antigravity", "Antigravity", 7, 68, -5.1, "antigravity-on-light.png", "antigravity-on-dark.png"],
+    ["openclaw", "OpenClaw", 19, 84, -.7, "openclaw-on-light.png", "openclaw-on-dark.png"],
+    ["opencode", "OpenCode", 80, 64, -4.1, "opencode-on-light.png", "opencode-on-dark.png"],
+    ["hermes-agent", "Hermes Agent", 22, 7, -3.2, "hermes-agent-on-light.png", "hermes-agent-on-dark.png"],
+    ["pi", "Pi", 92, 21, -5.8, "pi-on-light.png", "pi-on-dark.png"],
+    ["grok-build", "Grok Build", 50, 50, -1.8, "grok-build-on-light.png", "grok-build-on-dark.png"],
+    ["deepseek", "DeepSeek", 48, 93, -3.5, "deepseek.png", "deepseek.png"],
+    ["codebuddy", "CodeBuddy", 86, 35, -2.1, "codebuddy-on-light.png", "codebuddy-on-dark.png"],
+    ["cursor", "Cursor", 94, 68, -4.9, "cursor-on-light.png", "cursor-on-dark.png"],
+    ["qoder", "Qoder", 77, 89, -3.8, "qoder-on-light.png", "qoder-on-dark.png"],
+    ["trae", "TRAE", 78, 7, -1.2, "trae-on-light.png", "trae-on-dark.png"]
+  ];
+  const params = new URLSearchParams(window.location.search);
+  const preview = params.get("preview") === "true";
+  const shouldReturn = document.body.dataset.returnToApp === "true";
+  const pageState = document.body.dataset.pageState;
+  let locale = "en";
+  let displayMode = "auto";
+  let openMenu = null;
+
+  function preferredLocale() {
+    for (const language of navigator.languages || [navigator.language || "en"]) {
+      const normalized = language.toLowerCase();
+      if (normalized.startsWith("zh-hk") || normalized.startsWith("zh-tw")) return "zh-HK";
+      if (normalized.startsWith("zh")) return "zh-SG";
+      if (normalized.startsWith("ja")) return "ja";
+      if (normalized.startsWith("ko")) return "ko";
+    }
+    return "en";
+  }
+
+  function menuButton(label, selected, value, type) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("role", "menuitemradio");
+    button.setAttribute("aria-checked", String(selected));
+    button.dataset.value = value;
+    button.dataset.menuChoice = type;
+    const text = document.createElement("span");
+    text.textContent = label;
+    const check = document.createElement("span");
+    check.className = "beta-signin-popup-check";
+    check.setAttribute("aria-hidden", "true");
+    check.textContent = selected ? "✓" : "";
+    button.append(text, check);
+    return button;
+  }
+
+  function renderMenus() {
+    const languageMenu = document.querySelector('[data-menu="language"]');
+    const displayMenu = document.querySelector('[data-menu="display"]');
+    languageMenu.setAttribute("aria-label", copy[locale].language);
+    displayMenu.setAttribute("aria-label", copy[locale].display);
+    languageMenu.replaceChildren.apply(languageMenu, Object.keys(localeNames).map(function (value) { return menuButton(localeNames[value], value === locale, value, "language"); }));
+    displayMenu.replaceChildren.apply(displayMenu, ["auto", "light", "dark"].map(function (value) { return menuButton(copy[locale][value], value === displayMode, value, "display"); }));
+  }
+
+  function translate(nextLocale) {
+    locale = nextLocale;
+    document.documentElement.lang = nextLocale;
+    document.querySelectorAll("[data-i18n]").forEach(function (element) { element.textContent = copy[nextLocale][element.dataset.i18n]; });
+    document.querySelector('[data-menu-toggle="language"]').setAttribute("aria-label", copy[nextLocale].language);
+    document.querySelector('[data-menu-toggle="display"]').setAttribute("aria-label", copy[nextLocale].display);
+    renderMenus();
+  }
+
+  function resolvedTheme() { return displayMode === "auto" ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : displayMode; }
+  function applyTheme() { document.documentElement.dataset.betaSigninTheme = resolvedTheme(); renderMenus(); }
+  function closeMenus(restoreFocus) {
+    const previous = openMenu;
+    openMenu = null;
+    document.querySelectorAll("[data-menu]").forEach(function (menu) { menu.hidden = true; });
+    document.querySelectorAll("[data-menu-toggle]").forEach(function (button) { button.setAttribute("aria-expanded", "false"); });
+    if (restoreFocus && previous) document.querySelector('[data-menu-toggle="' + previous + '"]').focus();
+  }
+
+  document.addEventListener("click", function (event) {
+    const toggle = event.target.closest("[data-menu-toggle]");
+    const choice = event.target.closest("[data-menu-choice]");
+    if (choice) {
+      if (choice.dataset.menuChoice === "language") translate(choice.dataset.value);
+      else { displayMode = choice.dataset.value; applyTheme(); }
+      closeMenus(true);
+      return;
+    }
+    if (toggle) {
+      const name = toggle.dataset.menuToggle;
+      const opening = openMenu !== name;
+      closeMenus(false);
+      if (opening) {
+        openMenu = name;
+        document.querySelector('[data-menu="' + name + '"]').hidden = false;
+        toggle.setAttribute("aria-expanded", "true");
+        document.querySelector('[data-menu="' + name + '"] button').focus();
+      }
+      return;
+    }
+    if (!event.target.closest("[data-menu]")) closeMenus(false);
+  });
+  document.addEventListener("keydown", function (event) { if (event.key === "Escape" && openMenu) { event.preventDefault(); closeMenus(true); } });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { if (displayMode === "auto") applyTheme(); });
+
+  const halo = document.querySelector(".one-mind-beta-sign-in-tool-halo");
+  tools.forEach(function (tool) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "one-mind-beta-sign-in-tool-halo__item";
+    button.setAttribute("aria-label", tool[1]);
+    button.dataset.dragState = "idle";
+    button.dataset.toolId = tool[0];
+    button.style.setProperty("--one-mind-beta-sign-in-logo-x", tool[2] + "%");
+    button.style.setProperty("--one-mind-beta-sign-in-logo-y", tool[3] + "%");
+    button.style.setProperty("--one-mind-beta-sign-in-logo-delay", tool[4] + "s");
+    const surface = document.createElement("span");
+    surface.className = "one-mind-beta-sign-in-tool-halo__surface";
+    [tool[5], tool[6]].forEach(function (file, index) {
+      const image = document.createElement("img");
+      image.alt = "";
+      image.draggable = false;
+      image.decoding = "async";
+      image.className = index ? "one-mind-beta-theme-asset--on-dark" : "one-mind-beta-theme-asset--on-light";
+      image.src = "https://onemind.team/assets/ai-tools/squares/" + file;
+      surface.appendChild(image);
+    });
+    button.appendChild(surface);
+    halo.appendChild(button);
+  });
+
+  let drag = null;
+  const clamp = function (value, minimum, maximum) { return Math.min(Math.max(value, minimum), Math.max(minimum, maximum)); };
+  function positionTool(button, x, y, phase) {
+    const rect = halo.getBoundingClientRect();
+    const boundedX = clamp(x, 32, rect.width - 32);
+    const boundedY = clamp(y, 32, rect.height - 32);
+    button.style.setProperty("--one-mind-beta-sign-in-logo-drag-x", boundedX + "px");
+    button.style.setProperty("--one-mind-beta-sign-in-logo-drag-y", boundedY + "px");
+    button.dataset.dragState = phase;
+  }
+  halo.addEventListener("pointerdown", function (event) {
+    const button = event.target.closest("button");
+    if (!button || event.button !== 0) return;
+    const rect = button.getBoundingClientRect();
+    const haloRect = halo.getBoundingClientRect();
+    drag = { button: button, offsetX: event.clientX - rect.left - rect.width / 2, offsetY: event.clientY - rect.top - rect.height / 2 };
+    positionTool(button, rect.left + rect.width / 2 - haloRect.left, rect.top + rect.height / 2 - haloRect.top, "dragging");
+    event.preventDefault();
+  });
+  window.addEventListener("pointermove", function (event) { if (drag) { const rect = halo.getBoundingClientRect(); positionTool(drag.button, event.clientX - rect.left - drag.offsetX, event.clientY - rect.top - drag.offsetY, "dragging"); event.preventDefault(); } }, { passive: false });
+  window.addEventListener("pointerup", function () { if (drag) { drag.button.dataset.dragState = "placed"; drag = null; } });
+  halo.addEventListener("keydown", function (event) {
+    const deltas = { ArrowDown: [0, 16], ArrowLeft: [-16, 0], ArrowRight: [16, 0], ArrowUp: [0, -16] };
+    if (!deltas[event.key]) return;
+    const button = event.target.closest("button");
+    const rect = button.getBoundingClientRect();
+    const haloRect = halo.getBoundingClientRect();
+    positionTool(button, rect.left + rect.width / 2 - haloRect.left + deltas[event.key][0], rect.top + rect.height / 2 - haloRect.top + deltas[event.key][1], "placed");
+    event.preventDefault();
+  });
+
+  const canvas = document.querySelector(".one-mind-square-dot-sea canvas");
+  const context = canvas.getContext("2d");
+  const colors = [[16,163,127],[217,119,87],[66,133,244],[255,77,77],[101,88,245],[42,219,92],[0,233,155],[45,46,47]];
+  let canvasWidth = 0;
+  let canvasHeight = 0;
+  let animationFrame = 0;
+  let startedAt = performance.now();
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function interpolate(position) {
+    const wrapped = ((position % 1) + 1) % 1;
+    const scaled = wrapped * colors.length;
+    const left = colors[Math.floor(scaled) % colors.length];
+    const right = colors[(Math.floor(scaled) + 1) % colors.length];
+    const amount = scaled - Math.floor(scaled);
+    return "rgb(" + left.map(function (value, index) { return Math.round(value + (right[index] - value) * amount); }).join(" ") + ")";
+  }
+  function renderSea(timestamp) {
+    if (!canvasWidth || !canvasHeight) return;
+    const motionTime = (reducedMotion.matches ? 0 : (timestamp - startedAt) / 1000) * 1.75;
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
+    const columnSpacing = canvasWidth / 36;
+    const rowSpacing = canvasHeight / 31;
+    const baseSize = Math.max(2.8, Math.min(4.8, Math.sqrt(canvasWidth * canvasHeight) * .00425));
+    for (let row = 0; row < 30; row += 1) {
+      for (let column = 0; column < 35; column += 1) {
+        const normalizedX = (column + 1) / 36;
+        const normalizedY = (row + 1) / 31;
+        const phase = (column - 17) * .58 + row * .43;
+        const large = Math.sin(normalizedX * Math.PI * 1.55 + normalizedY * Math.PI * .85 - motionTime * .48);
+        const medium = Math.sin(normalizedX * Math.PI * 3.4 - normalizedY * Math.PI * 1.7 + motionTime * .78 + 1.2);
+        const small = Math.sin(normalizedX * Math.PI * 6.8 + normalizedY * Math.PI * 3.2 - motionTime * 1.15 + 2.4);
+        const wave = Math.tanh((large * .62 + medium * .27 + small * .11) * 1.35);
+        const height = (wave + 1) / 2;
+        const size = Math.max(1.35, baseSize * (.28 + Math.pow(height, 2) * 2.5));
+        const x = (column + 1) * columnSpacing + Math.cos((row - 14.5) * .36 + column * .23 + motionTime * .78) * columnSpacing * .045;
+        const y = (row + 1) * rowSpacing + wave * rowSpacing * .055;
+        context.globalAlpha = Math.min(.99, .16 + Math.pow(height, 1.65) * .82);
+        context.fillStyle = interpolate(phase * .038 + motionTime * .065 + wave * .055);
+        context.fillRect(x - size / 2, y - size / 2, size, size);
+      }
+    }
+    context.globalAlpha = 1;
+  }
+  function resizeSea() {
+    const bounds = canvas.getBoundingClientRect();
+    canvasWidth = Math.max(1, bounds.width);
+    canvasHeight = Math.max(1, bounds.height);
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(canvasWidth * ratio);
+    canvas.height = Math.round(canvasHeight * ratio);
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    renderSea(performance.now());
+  }
+  function tick(timestamp) { renderSea(timestamp); if (!reducedMotion.matches) animationFrame = requestAnimationFrame(tick); }
+  window.addEventListener("resize", resizeSea);
+  reducedMotion.addEventListener("change", function () { cancelAnimationFrame(animationFrame); startedAt = performance.now(); resizeSea(); if (!reducedMotion.matches) animationFrame = requestAnimationFrame(tick); });
+
+  translate(preferredLocale());
+  applyTheme();
+  resizeSea();
+  if (!reducedMotion.matches) animationFrame = requestAnimationFrame(tick);
+  window.history.replaceState(null, "", window.location.pathname);
+  const returnButton = document.getElementById("return-to-codex") || document.querySelector('.one-mind-auth-submit[href^="codex:"]');
+  if (returnButton) returnButton.addEventListener("click", function () { setTimeout(function () { window.close(); }, 1200); });
+  if (pageState === "success" && shouldReturn && !preview && returnButton) setTimeout(function () { window.location.href = returnButton.href; setTimeout(function () { window.close(); }, 1200); }, 350);
+})();
+</script>
+  </body>
+</html>

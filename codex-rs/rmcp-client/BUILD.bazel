@@ -2,6 +2,14 @@ load("//:defs.bzl", "codex_rust_crate")
 
 codex_rust_crate(
     name = "rmcp-client",
+    compile_data = [
+        "src/assets/oauth_callback_error.html",
+        "src/assets/oauth_callback_onemind_error.html",
+        "src/assets/oauth_callback_onemind_shell.css",
+        "src/assets/oauth_callback_onemind_shell.js",
+        "src/assets/oauth_callback_onemind_success.html",
+        "src/assets/oauth_callback_success.html",
+    ],
     crate_name = "codex_rmcp_client",
     extra_binaries = [
         "//codex-rs/cli:codex",
