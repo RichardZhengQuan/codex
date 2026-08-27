@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::string::String;
 use std::sync::Arc;
+use std::sync::mpsc;
 use std::time::Duration;
 
 use anyhow::Context;
@@ -14,7 +15,6 @@ use rmcp::transport::auth::AuthorizationMetadata;
 use rmcp::transport::auth::OAuthClientConfig;
 use rmcp::transport::auth::OAuthHttpClient;
 use rmcp::transport::auth::OAuthState;
-use tiny_http::Response;
 use tiny_http::Server;
 use tokio::sync::oneshot;
 use tokio::time::timeout;
@@ -31,6 +31,10 @@ use crate::oauth_callback::append_callback_id_to_redirect_uri;
 use crate::oauth_callback::callback_id_from_server_url;
 use crate::oauth_callback::callback_mode;
 use crate::oauth_callback::validate_callback_redirect;
+use crate::oauth_callback_page::OAuthCallbackBrand;
+use crate::oauth_callback_page::OAuthCallbackDestination;
+use crate::oauth_callback_page::OAuthCallbackPage;
+use crate::oauth_callback_page::callback_page_response;
 use crate::oauth_client_registration::McpOAuthClientRegistration;
 use crate::oauth_client_registration::PreparedOAuthLogin;
 use crate::oauth_client_registration::start_authorization as start_client_registration;
@@ -49,6 +53,12 @@ struct OAuthHttpContext {
 
 struct CallbackServerGuard {
     server: Arc<Server>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CallbackCompletion {
+    Success,
+    Error,
 }
 
 impl Drop for CallbackServerGuard {
@@ -263,6 +273,8 @@ fn spawn_callback_server(
     server: Arc<Server>,
     tx: oneshot::Sender<CallbackResult>,
     expected_callback_path: String,
+    destination: OAuthCallbackDestination,
+    brand: OAuthCallbackBrand,
 ) {
     tokio::task::spawn_blocking(move || {
         while let Ok(request) = server.recv() {
@@ -273,23 +285,44 @@ fn spawn_callback_server(
                     state,
                     issuer,
                 }) => {
-                    let response = Response::from_string(
-                        "Authentication complete. You may close this window.",
-                    );
-                    if let Err(err) = request.respond(response) {
-                        eprintln!("Failed to respond to OAuth callback: {err}");
-                    }
-                    if let Err(err) = tx.send(CallbackResult::Success(OauthCallbackResult {
-                        code,
-                        state,
-                        issuer,
+                    let (completion_tx, completion_rx) = mpsc::channel();
+                    if let Err(err) = tx.send(CallbackResult::Success(PendingOauthCallback {
+                        callback: OauthCallbackResult {
+                            code,
+                            state,
+                            issuer,
+                        },
+                        completion_tx,
                     })) {
                         eprintln!("Failed to send OAuth callback: {err:?}");
+                        let response = callback_page_response(
+                            OAuthCallbackPage::Error,
+                            /*status_code*/ 500,
+                            destination,
+                            brand,
+                        );
+                        if let Err(err) = request.respond(response) {
+                            eprintln!("Failed to respond to OAuth callback: {err}");
+                        }
+                        break;
+                    }
+                    let (page, status_code) = match completion_rx.recv() {
+                        Ok(CallbackCompletion::Success) => (OAuthCallbackPage::Success, 200),
+                        Ok(CallbackCompletion::Error) | Err(_) => (OAuthCallbackPage::Error, 500),
+                    };
+                    let response = callback_page_response(page, status_code, destination, brand);
+                    if let Err(err) = request.respond(response) {
+                        eprintln!("Failed to respond to OAuth callback: {err}");
                     }
                     break;
                 }
                 CallbackOutcome::Error(error) => {
-                    let response = Response::from_string(error.to_string()).with_status_code(400);
+                    let response = callback_page_response(
+                        OAuthCallbackPage::Error,
+                        /*status_code*/ 400,
+                        destination,
+                        brand,
+                    );
                     if let Err(err) = request.respond(response) {
                         eprintln!("Failed to respond to OAuth callback: {err}");
                     }
@@ -299,8 +332,12 @@ fn spawn_callback_server(
                     break;
                 }
                 CallbackOutcome::Invalid => {
-                    let response =
-                        Response::from_string("Invalid OAuth callback").with_status_code(400);
+                    let response = callback_page_response(
+                        OAuthCallbackPage::Error,
+                        /*status_code*/ 400,
+                        destination,
+                        brand,
+                    );
                     if let Err(err) = request.respond(response) {
                         eprintln!("Failed to respond to OAuth callback: {err}");
                     }
@@ -319,8 +356,14 @@ struct OauthCallbackResult {
 
 #[derive(Debug)]
 enum CallbackResult {
-    Success(OauthCallbackResult),
+    Success(PendingOauthCallback),
     Error(OAuthProviderError),
+}
+
+#[derive(Debug)]
+struct PendingOauthCallback {
+    callback: OauthCallbackResult,
+    completion_tx: mpsc::Sender<CallbackCompletion>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -632,7 +675,19 @@ impl OauthLoginFlow {
         };
         let callback_path = callback_path_from_redirect_uri(&redirect_uri)?;
         let (tx, rx) = oneshot::channel();
-        spawn_callback_server(server, tx, callback_path);
+        let callback_destination = if launch_browser {
+            OAuthCallbackDestination::Browser
+        } else {
+            OAuthCallbackDestination::CodexApp
+        };
+        let callback_brand = OAuthCallbackBrand::from_server_name(server_name);
+        spawn_callback_server(
+            server,
+            tx,
+            callback_path,
+            callback_destination,
+            callback_brand,
+        );
         let auth_url = append_query_param(
             &oauth_state.get_authorization_url().await?,
             "resource",
@@ -685,45 +740,60 @@ impl OauthLoginFlow {
                 .await
                 .context("timed out waiting for OAuth callback")?
                 .context("OAuth callback was cancelled")?;
-            let OauthCallbackResult {
-                code,
-                state: csrf_state,
-                issuer,
+            let PendingOauthCallback {
+                callback:
+                    OauthCallbackResult {
+                        code,
+                        state: csrf_state,
+                        issuer,
+                    },
+                completion_tx,
             } = match callback {
                 CallbackResult::Success(callback) => callback,
                 CallbackResult::Error(error) => return Err(anyhow!(error)),
             };
 
-            self.oauth_state
-                .handle_callback_with_issuer(&code, &csrf_state, issuer.as_deref())
-                .await
-                .context("failed to handle OAuth callback")?;
+            let result = async {
+                self.oauth_state
+                    .handle_callback_with_issuer(&code, &csrf_state, issuer.as_deref())
+                    .await
+                    .context("failed to handle OAuth callback")?;
 
-            let (client_id, credentials_opt) = self
-                .oauth_state
-                .get_credentials()
-                .await
-                .context("failed to retrieve OAuth credentials")?;
-            let credentials = credentials_opt
-                .ok_or_else(|| anyhow!("OAuth provider did not return credentials"))?;
+                let (client_id, credentials_opt) = self
+                    .oauth_state
+                    .get_credentials()
+                    .await
+                    .context("failed to retrieve OAuth credentials")?;
+                let credentials = credentials_opt
+                    .ok_or_else(|| anyhow!("OAuth provider did not return credentials"))?;
 
-            let expires_at = compute_expires_at_millis(&credentials);
-            let stored = StoredOAuthTokens {
-                server_name: self.server_name.clone(),
-                url: self.server_url.clone(),
-                issuer: self.authorization_server_issuer.clone(),
-                client_id,
-                token_response: WrappedOAuthTokenResponse(credentials),
-                expires_at,
+                let expires_at = compute_expires_at_millis(&credentials);
+                let stored = StoredOAuthTokens {
+                    server_name: self.server_name.clone(),
+                    url: self.server_url.clone(),
+                    issuer: self.authorization_server_issuer.clone(),
+                    client_id,
+                    token_response: WrappedOAuthTokenResponse(credentials),
+                    expires_at,
+                };
+                save_oauth_tokens(
+                    &self.server_name,
+                    &stored,
+                    self.store_mode,
+                    self.keyring_backend_kind,
+                )?;
+
+                Ok(())
+            }
+            .await;
+
+            let completion = if result.is_ok() {
+                CallbackCompletion::Success
+            } else {
+                CallbackCompletion::Error
             };
-            save_oauth_tokens(
-                &self.server_name,
-                &stored,
-                self.store_mode,
-                self.keyring_backend_kind,
-            )?;
-
-            Ok(())
+            let _ = completion_tx.send(completion);
+            result
         }
         .await;
 
@@ -1021,8 +1091,9 @@ mod tests {
             .query_pairs_mut()
             .append_pair("code", "test-code")
             .append_pair("state", state);
-        send_oauth_callback(callback_url).await?;
+        let callback = tokio::spawn(send_oauth_callback(callback_url));
         flow.finish(/*emit_browser_url*/ false).await?;
+        callback.await??;
 
         let stored = stored_oauth_credentials(
             "issuer-persistence-test",

@@ -1,0 +1,102 @@
+---
+source: rmcp-client/src/oauth_callback_page_tests.rs
+expression: page
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Connection complete</title>
+    <style>
+      :root {
+        --background: #ffffff;
+        --surface: #f7f7f7;
+        --text: #0d0d0d;
+        --secondary: #5d5d5d;
+        --border: rgb(13 13 13 / 10%);
+        --button: #0d0d0d;
+        --button-hover: #2b2b2b;
+        --button-text: #ffffff;
+        --success: #16803c;
+        font-family: "SF Pro", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: var(--background);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #181818;
+          --surface: rgb(255 255 255 / 5%);
+          --text: #ffffff;
+          --secondary: rgb(255 255 255 / 65%);
+          --border: rgb(255 255 255 / 10%);
+          --button: #ffffff;
+          --button-hover: #ededed;
+          --button-text: #0d0d0d;
+          --success: #65c983;
+        }
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: var(--background); }
+      .wordmark { position: fixed; inset: 20px auto auto 20px; font-size: 21px; font-weight: 650; letter-spacing: -0.45px; line-height: 24px; }
+      main { min-height: 100vh; display: grid; place-items: center; padding: 72px 24px 48px; }
+      .panel { width: min(100%, 480px); display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+      .status-mark { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 50%; background: var(--surface); color: var(--success); }
+      .status-mark svg { width: 24px; height: 24px; }
+      h1 { margin: 8px 0 0; font-size: 24px; font-weight: 600; letter-spacing: -0.45px; line-height: 32px; }
+      .message { max-width: 380px; margin: 0; color: var(--secondary); font-size: 14px; letter-spacing: -0.1px; line-height: 20px; }
+      .app-copy, .cli-copy { display: none; }
+      body[data-return-to-app="true"] .app-copy { display: block; }
+      body[data-return-to-app="false"] .cli-copy { display: block; }
+      .button { min-height: 40px; display: none; align-items: center; justify-content: center; margin-top: 8px; border: 1px solid var(--button); border-radius: 999px; background: var(--button); color: var(--button-text); font: inherit; font-size: 14px; font-weight: 560; line-height: 20px; padding: 9px 18px; text-decoration: none; }
+      body[data-return-to-app="true"] .button { display: inline-flex; }
+      .button:hover { background: var(--button-hover); border-color: var(--button-hover); }
+      .button:active { transform: translateY(1px); }
+      .button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+      .hint { margin: 0; color: var(--secondary); font-size: 12px; line-height: 18px; }
+      @media (prefers-reduced-motion: reduce) { .button:active { transform: none; } }
+    </style>
+  </head>
+  <body data-return-to-app="false">
+    <div class="wordmark" aria-label="Codex">Codex</div>
+    <main>
+      <section class="panel" aria-labelledby="completion-title">
+        <div class="status-mark" aria-hidden="true">
+          <svg fill="none" viewBox="0 0 24 24"><path d="m6.5 12.5 3.4 3.4 7.6-8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+        </div>
+        <h1 id="completion-title">Connection complete</h1>
+        <p class="message app-copy">You&rsquo;re connected. Returning you to Codex&hellip;</p>
+        <p class="message cli-copy">Authentication complete. You may close this tab and return to Codex.</p>
+        <a class="button" id="return-to-codex" href="codex://settings/connections">Return to Codex</a>
+        <p class="hint app-copy">If Codex does not open automatically, use the button above.</p>
+      </section>
+    </main>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const preview = params.get("preview") === "true";
+        const shouldReturn = document.body.dataset.returnToApp === "true";
+        const button = document.getElementById("return-to-codex");
+        window.history.replaceState(null, "", window.location.pathname);
+
+        function closeIfAllowed() {
+          window.close();
+        }
+
+        button.addEventListener("click", function () {
+          setTimeout(closeIfAllowed, 1200);
+        });
+
+        if (shouldReturn && !preview) {
+          setTimeout(function () {
+            window.location.href = button.href;
+            setTimeout(closeIfAllowed, 1200);
+          }, 350);
+        }
+      })();
+    </script>
+  </body>
+</html>

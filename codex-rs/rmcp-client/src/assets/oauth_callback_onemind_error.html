@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" data-beta-signin-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Authorize Codex · OneMind BETA</title>
+    <style>{{ONEMIND_SHELL_STYLE}}</style>
+  </head>
+  <body data-page-state="error" data-return-to-app="{{RETURN_TO_CODEX_APP}}">
+    <div class="beta-signin-app">
+      <header class="beta-signin-menu">
+        <a class="beta-signin-brand" href="https://onemind.team/#signin" aria-label="OneMind BETA">
+          <span class="beta-signin-mark-frame">
+            <img alt="" class="beta-signin-mark one-mind-beta-theme-asset--on-light" src="https://onemind.team/assets/beta-navigation/logo-light.png" />
+            <img alt="" class="beta-signin-mark one-mind-beta-theme-asset--on-dark" src="https://onemind.team/assets/beta-navigation/logo-dark.png" />
+          </span>
+          <span class="beta-signin-name">OneMind</span><span class="beta-signin-version">BETA</span>
+        </a>
+        <div class="beta-signin-actions">
+          <div class="beta-signin-control">
+            <button aria-expanded="false" aria-haspopup="menu" class="beta-signin-icon-button" data-menu-toggle="language" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M3.4 12h17.2M12 3c2.3 2.5 3.5 5.5 3.5 9S14.3 18.5 12 21c-2.3-2.5-3.5-5.5-3.5-9S9.7 5.5 12 3Z" stroke="currentColor" stroke-width="1.8"/></svg>
+            </button>
+            <div class="beta-signin-popup" data-menu="language" hidden role="menu"></div>
+          </div>
+          <div class="beta-signin-control">
+            <button aria-expanded="false" aria-haspopup="menu" class="beta-signin-icon-button" data-menu-toggle="display" type="button">
+              <img alt="" class="one-mind-beta-theme-asset--on-light" src="https://onemind.team/assets/beta-navigation/display-light.png" />
+              <img alt="" class="one-mind-beta-theme-asset--on-dark" src="https://onemind.team/assets/beta-navigation/display-dark.png" />
+            </button>
+            <div class="beta-signin-popup" data-menu="display" hidden role="menu"></div>
+          </div>
+        </div>
+      </header>
+      <main class="beta-signin-content">
+        <div aria-hidden="true" class="one-mind-square-dot-sea beta-signin-dot-sea"><canvas></canvas></div>
+        <div class="beta-signin-stage">
+          <div class="one-mind-beta-sign-in-tool-halo" data-beta-sign-in-tool-halo="true"></div>
+          <section class="one-mind-auth-panel signin-auth-panel beta-signin-panel beta-signin-panel--step-device-compact" aria-labelledby="authorization-title">
+            <header class="one-mind-auth-panel__header"><h1 class="one-mind-auth-panel__title signin-auth-title" data-i18n="title" id="authorization-title">Authorize Codex</h1></header>
+            <div class="one-mind-auth-status one-mind-auth-status--error signin-status-panel signin-status-panel--error" role="alert">
+              <strong data-i18n="errorTitle">Authorization not completed</strong>
+              <p data-i18n="errorBody">Return to Codex and try connecting OneMind again.</p>
+            </div>
+            <div class="beta-signin-return-actions">
+              <a class="one-mind-auth-submit beta-signin-return" data-i18n="returnToCodex" href="codex://settings/connections">Return to Codex</a>
+              <a class="beta-signin-enter-matrix" data-i18n="enterMatrix" href="https://onemind.team/">Enter Matrix</a>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <script>{{ONEMIND_SHELL_SCRIPT}}</script>
+  </body>
+</html>

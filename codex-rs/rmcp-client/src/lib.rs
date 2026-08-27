@@ -14,6 +14,7 @@ mod local_stdio_transport;
 mod logging_client_handler;
 mod oauth;
 mod oauth_callback;
+mod oauth_callback_page;
 mod oauth_client_registration;
 mod oauth_http_client;
 mod perform_oauth_login;
